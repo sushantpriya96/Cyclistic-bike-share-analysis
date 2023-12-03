@@ -1,0 +1,581 @@
+---
+title: "Cyclistic bike-share analysis"
+author: "Sushant Priya"
+date: "2023-11-02"
+output: html_document
+---
+
+##                      Chicago Cyclist Bike-share - Google Data Analysis
+
+
+###   Introduction
+
+Welcome to the Cyclistic bike-share analysis case study! In this case study, you will perform many real-world tasks of a junior data analyst. You will work for a fictional company, Cyclistic, and meet different characters and team members. In order to answer the key business questions, you will follow the steps of the data analysis process: 
+
+  1. Ask
+
+  2. Prepare
+
+  3. Process
+
+  4. Analyze
+
+  5. Share
+
+  6. Act
+
+###   Scenario
+
+You are a junior data analyst working in the marketing analyst team at Cyclistic, a bike-share company in Chicago. The director of marketing believes the company’s future success depends on maximizing the number of annual memberships. Therefore, your team wants to understand how casual riders and annual members use Cyclistic bikes differently. From these insights, your team will
+design a new marketing strategy to convert casual riders into annual members. But first, Cyclistic executives must approve your recommendations, so they must be backed up with compelling data insights and professional data visualizations.
+
+###   Shareholders:
+
+ ● Cyclistic
+
+ ● Lily Moreno The director of marketing and your manager
+
+ ● Cyclistic marketing analytics team
+
+ ● Cyclistic executive team
+
+###   About the company
+
+In 2016, Cyclistic launched a successful bike-share offering. Since then, the program has grown to a fleet of 5,824 bicycles that are geotracked and locked into a network of 692 stations across Chicago. The bikes can be unlocked from one station and returned to any other station in the system anytime.
+
+###   Goal:
+
+Design marketing strategies aimed at converting casual riders into annual members. In order to do
+that, however, the marketing analyst team needs to better understand how annual members and casual riders differ, why casual riders would buy a membership, and how digital media could affect their marketing tactics. Moreno and her team are interested in analyzing the Cyclistic historical bike trip data to identify trends.
+
+###      1.Ask
+
+Three questions will guide the future marketing program:
+1. How do annual members and casual riders use Cyclistic bikes differently?
+2. Why would casual riders buy Cyclistic annual memberships?
+3. How can Cyclistic use digital media to influence casual riders to become members?
+Moreno has assigned you the first question to answer: How do annual members and casual riders use Cyclistic bikes differently?
+
+You will produce a report with the following deliverables:
+1. A clear statement of the business task
+2. A description of all data sources used
+3. Documentation of any cleaning or manipulation of data
+4. A summary of your analysis
+5. Supporting visualizations and key findings
+6. Your top three recommendations based on your analysis
+
+####   Guiding questions
+
+ **● What is the problem you are trying to solve?**
+
+  Determine ways to convert casual riders into annual members
+
+ **● How can your insights drive business decisions?**
+
+  They could make the resourses allocation become more efficient
+
+####   Key tasks
+
+ 1. Identify the business task
+ 2. Consider key stakeholders
+
+####   Deliverable
+
+A clear statement of the business task </b> Define the main difference among casual and annual members in order to convert the former into later
+
+###       2 Prepare
+
+You will use Cyclistic’s historical trip data to analyze and identify trends. Download the previous 12 months of Cyclistic trip data here. (Note: The datasets have a different name because Cyclistic is a fictional company. For the purposes of this case study, the datasets are appropriate and will enable you to answer the business questions. The data has been made available by Motivate International Inc. under this license.) This is public data that you can use to explore how different customer types are using Cyclistic bikes. But note that data-privacy issues prohibit you from using riders’ personally identifiable information. This means that you won’t be able to connect pass purchases to credit card numbers to determine if casual riders live in the Cyclistic service area or if they have purchased multiple single passes. Now, prepare your data for analysis using the following Case Study Roadmap as a guide:
+
+####   Guiding questions
+
+**1. Where is your data located?**
+
+  The Original data can be acess and dowload at [divvy-tripdata ](https://divvy-tripdata.s3.amazonaws.com/index.html)
+
+**2. How is the data organized?**
+
+  In csv files, each row represents one ride and each columns contains the ride attributes such as duration, type of member and etc.
+
+**3. Are there issues with bias or credibility in this data? Does your data ROCCC?**
+
+  No bias and it Reliable, Original, Comprehensive, Current, Cited because it is a depiction of users data it was collect with a good consistency in terms of naming and data structure.
+
+**4. How are you addressing licensing, privacy, security, and accessibility?**
+
+  The company has it's own license shared here (The data has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).)
+
+**How did you verify the data’s integrity?**
+
+  By downloading and inspecting data previously and later using R to erasure it
+
+**6. How does it help you answer your question?**
+
+  Good and meaningful insights can help me answer the question.
+
+**7. Are there any problems with the data?**
+
+  There are minor problems that will be eliminated with cleaning process, such problems are missing data, duplicate and negative ride duration times.
+
+####       Key tasks
+
+  ● Download data and store it appropriately.
+  
+  ● Identify how its organized.
+  
+  ● Sort and filter the data.
+  
+  ● Determine the credibility of the data.
+
+####   Deliverable
+
+ **A description of all data sources used**
+The Original data can be acess and dowload at [divvy-tripdata](https://divvy-tripdata.s3.amazonaws.com/index.html) and the clean data that we will use in the analysis. I have download and cleaned all the 12 files representing a whole year of costumer data and stored in csv files.
+
+```{r}
+## Install required packages
+# install.packages("tidyverse")
+# install.packages("janitor")
+# install.packages("lubridate")
+# install.packages("ggplot2")
+# install.packages("ggpubr")
+# install.packages("dplyr")
+# install.packages("scales")
+# install.packages("modeest")
+```
+
+```{r}
+# Load required packages
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(scales)
+library(modeest)
+```
+#### Data Source: https://divvy-tripdata.s3.amazonaws.com/index.html
+
+```{r}
+rm(list = ls())
+dir("Google_Bike_Share",full.names = TRUE)
+
+# Import 12 data data frame
+df1 <- read.csv("./Google_Bike_Share/202201-divvy-tripdata.csv")
+df2 <- read.csv("./Google_Bike_Share/202202-divvy-tripdata.csv")
+df3 <- read.csv("./Google_Bike_Share/202203-divvy-tripdata.csv")
+df4 <- read.csv("./Google_Bike_Share/202204-divvy-tripdata.csv")
+df5 <- read.csv("./Google_Bike_Share/202205-divvy-tripdata.csv")
+df6 <- read.csv("./Google_Bike_Share/202206-divvy-tripdata.csv")
+df7 <- read.csv("./Google_Bike_Share/202207-divvy-tripdata.csv")
+df8 <- read.csv("./Google_Bike_Share/202208-divvy-tripdata.csv")
+df9 <- read.csv("./Google_Bike_Share/202209-divvy-publictripdata.csv")
+df10 <- read.csv("./Google_Bike_Share/202210-divvy-tripdata.csv")
+df11 <- read.csv("./Google_Bike_Share/202211-divvy-tripdata.csv")
+df12 <- read.csv("./Google_Bike_Share/202212-divvy-tripdata.csv")
+```
+
+```{r}
+# Combine 12 data frames into a single data frame
+bike_rides <- rbind(df1,df2,df3,df4,df5,df6,df7,df8,df9,df10,df11,df12)
+```
+
+###       3. Process
+
+Then, process your data for analysis using the following Case Study Roadmap as a guide:
+
+####   Guiding questions
+
+**1. What tools are you choosing and why?**
+
+  I am using R first because of its capabilities and second because of data to be processed and clean is very large
+
+**b. Have you ensured your data’s integrity?**
+
+  Yes the data has been consistently organized and named
+
+**c. What steps have you taken to ensure that your data is clean?**
+
+  First standardized time parsing method and later removed rides with negative duration or smaller than one-minute duration and start at the checking station
+
+**d. How can you verify that your data is clean and ready to analyze?**
+
+  Checking the time distribution and the absence of the checking station in the file.
+
+**e. Have you documented your cleaning process so you can review and share those results?**
+
+  Yes it is in this notebook
+
+####c  Key tasks
+
+  ● Check the data for errors.
+  
+  ● Choose your tools.
+  
+  ● Transform the data so you can work with it effectively.
+  
+  ● Document the cleaning process.
+
+####   Deliverable
+
+  Documentation of any cleaning or manipulation of data
+
+
+```{r}
+# Convert Date/Time
+bike_rides$started_at <- lubridate::ymd_hms(bike_rides$started_at)
+bike_rides$ended_at <- lubridate::ymd_hms(bike_rides$ended_at)
+```
+
+```{r}
+# Calculate ride length in mins and change in numeric format
+bike_rides$ride_length <- difftime(bike_rides$ended_at,bike_rides$started_at, units = "min")
+bike_rides$ride_length <- as.numeric(bike_rides$ride_length)
+```
+
+```{r}
+# Remove invalid value or 'less than or equal to 0' from column start_station_name and trip_duration_minutes
+bike_ride2 <- na.omit(bike_rides$start_station_name) 
+bike_ride2 <- bike_rides %>% filter(ride_length >0)
+```
+
+```{r}
+# create duration column
+bike_ride2 <- bike_rides
+bike_ride2$duration <- strftime(as.POSIXct("00:00:00", format="%H:%M:%S") + bike_rides$ride_length , format="%H:%M:%S")
+```
+
+```{r}
+# Create column day of week
+bike_ride2$day_of_week <- wday(bike_ride2$started_at)
+
+# Create column month
+bike_ride2$month <- month(bike_ride2$started_at, label= T, abbr= F )
+
+# Create column year
+bike_ride2$year <- year(bike_ride2$started_at)
+
+# Create a column hour
+bike_ride2$hour <- hour(bike_ride2$started_at)
+
+# Create a column day
+bike_ride2$day <- weekdays(as.Date(bike_ride2$started_at, label= T, abbr= F ))
+```
+
+
+####   Cleaning three different types of data noises
+
+  ● Duplicates;
+  
+  ● Quality check rides and remove rides with negative duration;
+  
+  ● Outlines.
+
+```{r}
+# bike_ride2[!duplicated(bike_ride2$ride_id) ,]
+bike_ride2 <- bike_ride2 %>% distinct(bike_ride2$ride_id, .keep_all = TRUE)
+```
+
+
+```{r}
+# Removing empty columns and rows using janitor
+ bike_ride2 <- bike_ride2 %>% 
+   filter(if_all(c(start_station_name, end_station_name), nzchar))
+
+
+# bike_rides <- janitor::remove_empty(bike_rides,which = c("rows", "cols"))
+# bike_rides <- janitor::remove_empty(bike_rides,which = c("cols"))
+```
+
+
+
+###  Analyze
+
+Now data is stored appropriately and has been prepared for analysis, start putting it to work.
+
+####  Guiding questions
+
+**1. How should you organize your data to perform analysis on it?**
+
+   By ascendant date in a single csv file containing all months together
+
+**2. Has your data been properly formatted?**
+
+   Yes, all columns are properly matching it's data format
+
+**3. What surprises did you discover in the data?**
+
+   Although the majority of user are members casual user spend more time riding bikes
+
+**4. What trends or relationships did you find in the data?**
+
+   The week day has an impact in the usage of bike
+
+**5. How will these insights help answer your business questions?**
+
+   Knowing your customers is a way to offer a better service.
+
+####   Key tasks
+
+   ● Aggregate your data so its useful and accessible.
+   
+   ● Organize and format your data.
+   
+   ● Perform calculations.
+   
+   ● Identify trends and relationships.
+
+####   Deliverable
+
+#####   A summary of your analysis
+
+The subscriber group represent the biggest share of riders with 59 % ; however casual riders spent more time more than the subscribers.
+
+The busiest time for the casual user are 5PM 
+
+The busiest weekday are saturday
+
+The busiest month are july
+
+In weekends the most popular days for a bike ride especially for casual riders
+
+
+####   Summary of the data we are analyzing
+
+```{r}
+summary(bike_ride2)
+```
+
+```{r}
+# Time spent riding over the year
+total <- bike_ride2 %>% 
+  group_by(day_of_week) %>% 
+  summarize(count = n(),total_time = sum(ride_length)) %>% 
+  arrange(desc(count))
+print(total)
+```
+
+```{r}
+# Calculate total ride in each categery
+casual_member <- bike_ride2 %>% 
+  group_by(member_casual) %>% 
+  summarise(number_of_ride= n(),percent=(length(ride_id)/nrow(bike_ride2))*100,)
+print(casual_member)
+```
+
+```{r}
+# Calculate number of ride and total time in each category
+casual_member <- bike_ride2 %>% 
+  group_by(member_casual) %>% 
+  summarise(number_of_ride=n(),
+            total_time= sum(ride_length))
+print(casual_member)
+
+```
+
+
+```{r}
+# Calculate total number of rides
+total_rides = nrow(bike_ride2)
+print(total_rides)
+```
+
+```{r}
+# Calculate busiest time
+busiest_time <- bike_ride2 %>%
+  group_by(hour) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>% 
+  head(1)
+print(busiest_time)
+```
+
+```{r}
+# Calculate busiest week day
+busiest_week_day <- bike_ride2 %>% 
+  group_by(day_of_week) %>% 
+  summarise(count = n())  %>% 
+  arrange(desc(count)) %>% 
+  head(1)
+print(busiest_week_day)
+```
+
+```{r}
+# Calculate busiest month
+busiest_month <- bike_ride2 %>% 
+  group_by(month) %>% 
+  summarise(count = n())  %>% 
+  arrange(desc(count)) %>% 
+  head(1)
+print(busiest_month)
+```
+
+```{r}
+# Calculate popular bike type
+popular_bike_type <- bike_ride2 %>% 
+  group_by(rideable_type) %>% 
+  summarise(count =n()) %>% 
+  arrange(desc(count)) %>% 
+  head(1)
+print(popular_bike_type)
+```
+
+```{r}
+# Export csv file
+write.csv(bike_ride2,"google_project.csv", row.names = FALSE) 
+```
+
+```{r}
+graph1 <- bike_ride2 %>% 
+  group_by(member_casual,  hour) %>% 
+  summarise(number_of_rides = n()/1000
+            ,duration = sum(ride_length)) %>% 
+  arrange(member_casual, hour)  %>% 
+  ggplot(aes(x = hour, y = number_of_rides, fill = member_casual)) +
+  scale_x_continuous(breaks=seq(0,23,1))+
+  geom_col(position = "dodge")+
+  labs(title = "Total Number of Rides Hourly ", x = "24 hours", y = "Riders per thousand", fill = "Rider Type")
+print(graph1)
+```
+
+```{r}
+graph2 <-bike_ride2 %>%
+  group_by(member_casual, hour) %>%
+  summarise(number_of_rides = n()
+            ,total_duration = sum(ride_length)/1000) %>%
+  arrange(member_casual, hour)  %>%
+  ggplot(aes(x = hour, y = total_duration, fill = member_casual)) +
+  scale_x_continuous(breaks=seq(0,23,1))+
+  geom_col(position = "dodge")+
+  labs(title = "Total of Minutes Ridden Hourly", x = "24 hours", y = "Minutes ridden per thousand", fill = "Rider Type")
+print(graph2)
+```
+
+```{r}
+graph3 <-bike_ride2 %>% 
+  group_by(member_casual, day) %>% 
+  summarise(number_of_rides = n()/1000
+            ,duration = sum(ride_length)) %>% 
+  arrange(member_casual, day) %>% 
+  ggplot(aes(x = factor(day, levels=c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")), y = number_of_rides, fill = member_casual)) +
+  geom_col(position = "dodge")+
+  labs(title = "Total Number of Riddes Weekly", x = "", y = "Riders per thousand", fill = "Rider Type")
+print(graph3)
+```
+
+```{r}
+graph4 <- bike_ride2 %>% 
+  group_by(member_casual, day) %>% 
+  summarise(number_of_rides = n(),
+            total_duration = sum(ride_length)/1000) %>% 
+  arrange(member_casual,day) %>% 
+  ggplot(aes(x= factor(day, levels=c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")), y= total_duration, fill= member_casual))+
+  geom_col(position = "dodge")+
+  labs(title ="Total Minute Ridden weakely", x="", y="Minutes ridden per thousand", fill= "Ride Type" )
+print(graph4)
+```
+
+```{r}
+graph5 <- bike_ride2 %>% 
+  group_by(member_casual, month) %>% 
+  summarise(number_of_rides = n()/1000
+            ,duration = sum(ride_length)) %>%
+  arrange(member_casual,month)  %>% 
+  ggplot(aes(x = month, y = number_of_rides, fill = member_casual)) +
+  geom_col(position = "dodge")+
+  labs(title = "Total Number of Rides Monthly", x = "", y = "Riders per thousand", fill = "Rider Type")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.3, hjust=0.5))
+print(graph5)
+```
+
+```{r}
+graph6 <- bike_ride2 %>% 
+  group_by(member_casual, month) %>%
+  summarise(number_of_rides = n()
+            ,total_duration = sum(ride_length)/1000) %>% 
+  arrange(member_casual, month)  %>% 
+  ggplot(aes(x = month, y = total_duration, fill = member_casual)) +
+  geom_col(position = "dodge")+
+  labs(title = "Total of Minutes Ridden Monthly", x = "", y = "Minutes ridden per thousand", fill = "Rider Type")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.3, hjust=0.5))
+print(graph6)
+```
+
+###     Share
+
+Now that you have performed your analysis and gained some insights into your data, create visualizations to share your findings.
+Moreno has reminded you that they should be sophisticated and polished in order to effectively communicate to the executive
+team. Use the following Case Study Roadmap as a guide:
+
+#### Guiding questions
+
+**1. Were you able to answer the question of how annual members and casual riders use Cyclistic bikes differently?**
+
+  Yes they differ in number and ridding profile (i.e day of the week, schedule, ride duration, and constancy)
+
+**2. What story does your data tell?**
+
+  Users have different preferences on schedule, ride duration, and constancy of use
+
+**3. How do your findings relate to your original question?**
+
+  They target the main question which is "What are the key differences between casual and annual riders
+
+**4. Who is your audience? What is the best way to communicate with them?**
+
+  The market team and the manager. Probably a slide presentation
+
+**5. Can data visualization help you share your findings?**
+
+  Yes they were designed for this end
+
+**6. Is your presentation accessible to your audience?**
+
+  Yes the figure, color, and legends are consistent throughout the presentation, also very simple to interpret with titles and labels allowing easy understanding
+  
+####   Key tasks
+
+  a. Determine the best way to share your findings.
+  b. Create effective data visualizations.
+  c. Present your findings.
+  d. Ensure your work is accessible.
+  
+####   Deliverable
+
+  Supporting visualizations and key findings
+  Ensure your work is accessible.
+
+###      Act
+
+  Now that you have finished creating your visualizations, act on your findings. Prepare the deliverables Morena asked you to create, including the three top recommendations based on your analysis. Use the following Case Study Roadmap as a guide:
+
+####   Guiding questions
+
+**1. What is your final conclusion based on your analysis?**
+
+  Users have different preferences on schedule, ride duration, and constancy of use
+
+**2. How could your team and business apply your insights?**
+
+   During the weekends go to the most popular ride station and marketing the benefits of becoming an annual member
+
+**3. What next steps would you or your stakeholders take based on your findings?**
+
+  Investigate what is the socio-economic profile of these users and try to target specific social media when marketing subscriptions
+
+**4. Is there additional data you could use to expand on your findings?**
+
+  Yes gender, age,climate, profession, how many times the same rider use the service
+  
+####   Key tasks
+  1. Create your portfolio.
+  2. Add your case study.
+  3. Practice presenting your case study to a friend or family member.
+
+####   Deliverable
+
+ **Your top three recommendations based on your analysis**
+
+Promote campaigns during the weekends or subscriptions valid for weekend
+Offer or discount to the new customer 
